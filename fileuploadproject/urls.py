@@ -39,12 +39,20 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from fileupload.views import DocumentViewSet
+from fileupload import views
 
-# Create a router and register our viewset
+
 router = DefaultRouter()
 router.register(r'documents', DocumentViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),  # This line includes the API routes
+    path('api/', include(router.urls)),
+    path('', views.home, name='home'),
+    
 ]
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
