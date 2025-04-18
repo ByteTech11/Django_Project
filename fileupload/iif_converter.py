@@ -25,7 +25,7 @@ def convert_excel_to_iif(excel_file, output_iif_path):
         date = formatted_date  
         job = "Default Job"
         emp = row['Employee']
-        item = "Hourly Rate"  
+        item = "ST Rate"  
         pitem = "Regular Pay"  
         duration = row['Total'] if pd.notna(row['Total']) else row['Reg Hours']  
         proj = ""
