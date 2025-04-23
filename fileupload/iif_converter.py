@@ -25,21 +25,33 @@ def convert_excel_to_iif(excel_file, output_iif_path):
         date = formatted_date  
         job = "Default Job"
         emp = row['Employee']
-        item = "ST Rate"  
-        pitem = "Regular Pay"  
+        emp_num = row['Emp\nNum']  # Employee number (Emp Num)
+        item = "ST Rate"  # By Default item for regular pay
+        pitem = "Regular Pay"
         duration = row['Total'] if pd.notna(row['Total']) else row['Reg Hours']  
         proj = ""
-        note = ""
+        note = f"EMP_ID:{emp_num}"  # Include Emp Num (Employee ID) in Notes in the format EMP_ID:12045
         xfertopayroll = "Y"
         billingstatus = "1"
-
-        iif_row = f"{timeact}\t{date}\t{job}\t{emp}\t{item}\t{pitem}\t{duration}\t{proj}\t{note}\t{xfertopayroll}\t{billingstatus}"
-        iif_data.append(iif_row)
+        
+        if duration > 80:
+            regular_duration = 80
+            iif_row_regular = f"{timeact}\t{date}\t{job}\t{emp}\t{item}\t{pitem}\t{regular_duration}\t{proj}\t{note}\t{xfertopayroll}\t{billingstatus}"
+            iif_data.append(iif_row_regular)
+            # For those who exceed 80 hours
+            overtime_duration = duration - 80
+            item = "OT Rate"
+            pitem = "Overtime Pay"
+            iif_row_overtime = f"{timeact}\t{date}\t{job}\t{emp}\t{item}\t{pitem}\t{overtime_duration}\t{proj}\t{note}\t{xfertopayroll}\t{billingstatus}"
+            iif_data.append(iif_row_overtime)
+        else:
+            # For employees who haven't exceeded 80 hours
+            iif_row = f"{timeact}\t{date}\t{job}\t{emp}\t{item}\t{pitem}\t{duration}\t{proj}\t{note}\t{xfertopayroll}\t{billingstatus}"
+            iif_data.append(iif_row)
 
     iif_content = "\n".join(iif_data)
 
     try:
-    
         with open(output_iif_path, 'w') as iif_file:
             iif_file.write(iif_content)
         print(f"IIF file successfully created: {output_iif_path}")
@@ -49,7 +61,7 @@ def convert_excel_to_iif(excel_file, output_iif_path):
     return iif_content
 
 
-excel_file_path = 'path/to/your/excel_file.xlsx'  
-output_iif_path = 'path/to/output_file.iif'  
+excel_file_path = 'path/to/your/excel_file.xlsx' 
+output_iif_path = 'path/to/output_file.iif' 
 
 convert_excel_to_iif(excel_file_path, output_iif_path)
